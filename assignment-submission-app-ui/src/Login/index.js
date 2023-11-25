@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocalState } from "../util/useLocalStrorage";
+import { ajax } from "../Services/fetchService";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -11,6 +12,7 @@ const Login = () => {
       username: username,
       password: password,
     };
+    // ajax("api/auth/login", "POST", jwt, reqBody);
     fetch("api/auth/login", {
       headers: {
         "Content-Type": "application/json",
