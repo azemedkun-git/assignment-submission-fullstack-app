@@ -1,4 +1,4 @@
-import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Homepage from "./Homepage";
