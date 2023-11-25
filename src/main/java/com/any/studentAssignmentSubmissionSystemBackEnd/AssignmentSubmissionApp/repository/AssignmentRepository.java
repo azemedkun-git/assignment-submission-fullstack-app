@@ -1,4 +1,11 @@
 package com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.repository;
 
-public interface AssignmentRepository extends org.springframework.data.jpa.repository.JpaRepository<com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain.Assignment, java.lang.Long> {
+import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain.Assignment;
+import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Set;
+
+public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
+    Set<Assignment> findByUser(User user);
 }

@@ -22,7 +22,8 @@ public class User implements UserDetails {
     private LocalDate cohortStartDate;
     private String username;
     private String password;
-//    private List<Authority> authorities = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Authority> authorities = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

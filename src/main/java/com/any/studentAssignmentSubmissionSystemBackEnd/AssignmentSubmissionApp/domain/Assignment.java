@@ -1,12 +1,16 @@
 package com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +20,6 @@ public class Assignment {
     private String branch;
     private String coeReviewVideoUrl;
     @ManyToOne(optional = false)
-    private User assignedTo;
+    private User user;
 
 }
