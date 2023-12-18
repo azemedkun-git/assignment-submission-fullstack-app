@@ -3,6 +3,7 @@ package com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp
 import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.Util.JwtUtil;
 import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain.User;
 import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.dto.AuthCredentialRequest;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,10 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,5 +44,17 @@ public class AuthController {
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @GetMapping("validate")
+    public ResponseEntity<?> validateToken(@RequestParam String token, @AuthenticationPrincipal User user){
+        try {
+            Boolean isTokenValid = jwtUtil.validateToken(token, user);
+            return ResponseEntity.ok(isTokenValid);
+        }catch (ExpiredJwtException e){
+            System.out.println("invalid token");
+        }
+        return ResponseEntity.ok(false);
+
     }
 }

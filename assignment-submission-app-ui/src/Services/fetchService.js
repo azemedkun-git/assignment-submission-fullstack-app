@@ -2,7 +2,7 @@ export const ajax = (url, requestMethod, jwt, requestBody) => {
   const fetchData = {
     headers: {
       "content-type": "application/json",
-      Authorization: `Bearer ${jwt}`,
+      //Authorization: `Bearer ${jwt}`,
     },
     method: requestMethod,
   };
