@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -24,26 +24,54 @@ export const AssignmentView = () => {
   const [assignment, setAssignment] = useState({
     githubUrl: "",
     branch: "",
+    number: null,
+    status: null,
   });
-  //const { githubUrl, branch } = assignment;
-
+  const [assignmentEnums, setAssignmentEnums] = useState([]);
+  const [assignmentStatuses, setAssignmentStatuses] = useState([]);
   function updateAssignment(prop, value) {
     const newAssignment = { ...assignment };
     newAssignment[prop] = value;
     setAssignment(newAssignment);
-    // setAssignment({ ...assignment, [e.target.name]: e.target.value });
   }
-
-  function save() {
+  function persist() {
     ajax(`/api/assignments/${id}`, "PUT", jwt, assignment).then(
       (assignmentData) => {
         setAssignment(assignmentData);
       }
     );
   }
+  //Save func modified to support useRef and fix problems with persisting staus change
+  function save() {
+    if (assignment.status === assignmentStatuses[0].status) {
+      updateAssignment("status", assignmentStatuses[1].status);
+    } else persist();
+  }
+
+  //useRef and below block of code, is required because the asynchronousness of React do not allow the assignment
+  //status in the save() function to change and send to database immediately.
+  // It allows change to occur later. So, the change is not reflected in the database
+
+  /********************** From Here ****************************************/
+  const previousAssignmentValue = useRef(assignment);
+
   useEffect(() => {
-    ajax(`/api/assignments/${id}`, "GET", jwt).then((assignmentData) => {
+    if (previousAssignmentValue.current.status !== assignment.status) {
+      persist();
+    }
+    previousAssignmentValue.current = assignment;
+  }, [assignment]);
+
+  /********************* To Here *******************************************/
+
+  useEffect(() => {
+    ajax(`/api/assignments/${id}`, "GET", jwt).then((assignmentResponse) => {
+      let assignmentData = assignmentResponse?.assignment;
+      if (assignmentData.branch === null) assignmentData.branch = "";
+      if (assignmentData.githubUrl === null) assignmentData.githubUrl = "";
       setAssignment(assignmentData);
+      setAssignmentEnums(assignmentResponse.assignmentEnums);
+      setAssignmentStatuses(assignmentResponse.statusEnums);
     });
   }, [id, jwt]);
 
@@ -51,7 +79,7 @@ export const AssignmentView = () => {
     <Container className="mt-5">
       <Row className="d-flex align-items-center">
         <Col>
-          <h1>Assignment {id}</h1>
+          {assignment.number ? <h1>Assignment {assignment.number}</h1> : <></>}
         </Col>
         <Col>
           <Badge pill bg="info" style={{ fontSize: "1em" }}>
@@ -62,50 +90,58 @@ export const AssignmentView = () => {
 
       {assignment ? (
         <>
-          <Form.Group as={Row} className="my-3" controlId="formPlaintextEmail">
+          <Form.Group as={Row} className="my-3" controlId="assignmentName">
             <Form.Label column sm="3" md="2">
               Assignment Number:
             </Form.Label>
             <Col sm="9" md="8" lg="6">
               <DropdownButton
                 as={ButtonGroup}
-                id="assignmentName"
                 variant={"info"}
-                title="assignment 1"
+                title={
+                  assignment.number
+                    ? `Assignment ${assignment.number}`
+                    : "Select an assignment"
+                }
+                onSelect={(selectedElement) =>
+                  updateAssignment("number", selectedElement)
+                }
               >
-                {[1, 2, 3, 4, 5].map((assignmentNum) => (
-                  <Dropdown.Item eventKey={assignmentNum}>
-                    {assignmentNum}
+                {assignmentEnums.map((assignmentEnum) => (
+                  <Dropdown.Item
+                    eventKey={assignmentEnum.assignmentNum}
+                    key={assignmentEnum.assignmentNum}
+                  >
+                    {assignmentEnum.assignmentNum}{" "}
+                    {assignmentEnum.assignmentName}
                   </Dropdown.Item>
                 ))}
               </DropdownButton>
             </Col>
           </Form.Group>
-          <Form.Group as={Row} className="my-3" controlId="formPlaintextEmail">
+          <Form.Group as={Row} className="my-3" controlId="githubRrl">
             <Form.Label column sm="3" md="2">
               GitHub URL:
             </Form.Label>
             <Col sm="9" md="8" lg="6">
               <Form.Control
-                id="githubRrl"
                 type="url"
-                value={assignment.githubUrl || ""}
+                value={assignment?.githubUrl || ""}
                 onChange={(e) => updateAssignment("githubUrl", e.target.value)}
                 placeholder="Https://github.com/username/repo-name"
               />
             </Col>
           </Form.Group>
-          <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+          <Form.Group as={Row} className="mb-3" controlId="branch">
             <Form.Label column sm="3" md="2">
               Branch :
             </Form.Label>
             <Col sm="9" md="8" lg="6">
               <Form.Control
-                id="branch"
                 type="text"
                 name="branch"
-                value={assignment.branch || ""}
-                onChange={(e) => updateAssignment(e)}
+                value={assignment?.branch || ""}
+                onChange={(e) => updateAssignment("branch", e.target.value)}
                 placeholder="example_branch_name"
               />
             </Col>

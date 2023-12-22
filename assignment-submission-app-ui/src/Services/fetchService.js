@@ -1,4 +1,4 @@
-export const ajax = (url, requestMethod, jwt, requestBody) => {
+export const ajax = async (url, requestMethod, jwt, requestBody) => {
   const fetchData = {
     headers: {
       "content-type": "application/json",
@@ -12,7 +12,6 @@ export const ajax = (url, requestMethod, jwt, requestBody) => {
   if (requestBody) {
     fetchData.body = JSON.stringify(requestBody);
   }
-  return fetch(url, fetchData).then((response) => {
-    if (response.status === 200) return response.json();
-  });
+  const response = await fetch(url, fetchData);
+  if (response.status === 200) return response.json();
 };

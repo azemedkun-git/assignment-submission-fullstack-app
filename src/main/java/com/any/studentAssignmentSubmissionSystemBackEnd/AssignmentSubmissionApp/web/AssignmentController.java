@@ -2,6 +2,7 @@ package com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp
 
 import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain.Assignment;
 import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.domain.User;
+import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.dto.AssignmentResponseDto;
 import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AssignmentController {
     @GetMapping("{id}")
     public ResponseEntity<?> getAssignment(@PathVariable Long id , @AuthenticationPrincipal User user){
         Optional<Assignment> assignmentsOpt =assignmentService.findById(id);
-        return ResponseEntity.ok(assignmentsOpt.orElse(new Assignment()));
+        return ResponseEntity.ok(new AssignmentResponseDto(assignmentsOpt.orElse(new Assignment())));
     }
     @PutMapping("{id}")
     public ResponseEntity<?> updateAssignment(@PathVariable Long id ,
