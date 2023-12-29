@@ -7,6 +7,7 @@ import com.any.studentAssignmentSubmissionSystemBackEnd.AssignmentSubmissionApp.
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,9 +20,17 @@ public class AssignmentService {
         Assignment assignment
                 = new Assignment();
         assignment.setStatus(AssignmentStatusEnum.PENDING_SUBMISSION.getStatus());
+        assignment.setNumber(findNextAssignmentToSubmit(user));
         assignment.setUser(user);
         return assignmentRepository.save(assignment);
     }
+
+    private Integer findNextAssignmentToSubmit(User user) {
+        Set<Assignment> assignmentByUser = assignmentRepository.findByUser(user);
+        Optional<Assignment> currNumber = assignmentByUser.stream().max(Comparator.comparingInt(Assignment::getNumber));
+        return currNumber.map(assignment -> assignment.getNumber() + 1).orElse(1);
+    }
+
     public Set<Assignment> findByUser(User user){
         return assignmentRepository.findByUser(user);
     }

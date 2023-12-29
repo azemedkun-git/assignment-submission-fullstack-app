@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocalState } from "../util/useLocalStrorage";
-import { Link, Navigate } from "react-router-dom";
 import { ajax } from "../Services/fetchService";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Row } from "react-bootstrap";
 
 const Dashboard = () => {
   const [jwt, setJwt] = useLocalState("", "jwt");
@@ -21,6 +20,20 @@ const Dashboard = () => {
   }
   return (
     <div style={{ margin: "2em" }}>
+      <Row>
+        <Col>
+          <div
+            className="d-flex justify-content-end"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              setJwt(null);
+              window.location.href = "/login";
+            }}
+          >
+            Log out
+          </div>
+        </Col>
+      </Row>
       <div className="mb-4">
         <Button size="lg" onClick={() => createAssignment()}>
           Submit New Assignment
@@ -35,9 +48,21 @@ const Dashboard = () => {
           {assignments.map((assignment) => (
             <Card style={{ width: "18rem" }} key={assignment.id}>
               <Card.Body className="d-flex flex-column justify-content-around">
-                <Card.Title> Assignment # {assignment.id}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted"></Card.Subtitle>
-                {assignment.status}
+                <Card.Title> Assignment # {assignment.number}</Card.Title>
+                {/* <Card.Subtitle className="mb-2 text-muted">
+                  {assignment.status}
+                </Card.Subtitle> */}
+                {/* This div is required to keep the staus at the 
+                start only, not to expand to the full card width */}
+                <div className="d-flex align-items-start">
+                  <Badge
+                    pill
+                    bg="info"
+                    style={{ fontSize: "1em", justifyContent: "flex-start" }}
+                  >
+                    {assignment.status}
+                  </Badge>
+                </div>
                 <Card.Text style={{ marginTop: "1em" }}>
                   <p>
                     <b>GitHub Url</b>: {assignment.githubUrl}
