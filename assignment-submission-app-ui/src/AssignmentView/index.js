@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useLocalState } from "../util/useLocalStrorage";
 import { ajax } from "../Services/fetchService";
 import {
@@ -15,8 +15,10 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
+import { StatusBadge } from "../StatusBadge";
 
 export const AssignmentView = () => {
+  //let navigate = useNavigate();
   const [jwt, setJwt] = useLocalState("", "jwt");
   //const assignmentId = window.location.href.split("/assignments/")[1]; //This can also work to get the path
   const { id } = useParams();
@@ -42,9 +44,9 @@ export const AssignmentView = () => {
     );
   }
   //Save func modified to support useRef and fix problems with persisting staus change
-  function save() {
-    if (assignment.status === assignmentStatuses[0].status) {
-      updateAssignment("status", assignmentStatuses[1].status);
+  function save(status) {
+    if (status && assignment.status !== status) {
+      updateAssignment("status", status);
     } else persist();
   }
 
@@ -82,9 +84,7 @@ export const AssignmentView = () => {
           {assignment.number ? <h1>Assignment {assignment.number}</h1> : <></>}
         </Col>
         <Col>
-          <Badge pill bg="info" style={{ fontSize: "1em" }}>
-            {assignment?.status}
-          </Badge>
+          <StatusBadge text={assignment.status} />
         </Col>
       </Row>
 
@@ -146,18 +146,67 @@ export const AssignmentView = () => {
               />
             </Col>
           </Form.Group>
-          <div className="d-flex gap-5">
-            <Button size="lg" type="submit" onClick={() => save()}>
-              Submit Assignment
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => (window.location.href = "/dashboard")}
-            >
-              Back
-            </Button>
-          </div>
+          {assignment.status === "Completed" ? (
+            <>
+              <Form.Group
+                as={Row}
+                className="d-flex align-items-center mb-3"
+                controlId="codeReviewVideoUrl"
+              >
+                <Form.Label column sm="3" md="2">
+                  Code Review Video URL:
+                </Form.Label>
+                <Col sm="9" md="8" lg="6">
+                  <a href={assignment.codeReviewVideoUrl}>
+                    {assignment.codeReviewVideoUrl}
+                  </a>
+                </Col>
+              </Form.Group>
+              <div className="d-flex gap-5">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={() => (window.location.href = "/dashboard")}
+                >
+                  Back
+                </Button>
+              </div>
+            </>
+          ) : assignment.status === "Needs Update" ? (
+            <div className="d-flex gap-5">
+              <Button
+                size="lg"
+                type="submit"
+                onClick={() => save(assignmentStatuses[5].status)}
+              >
+                Resubmit Assignment
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => (window.location.href = "/dashboard")}
+              >
+                Back
+              </Button>
+            </div>
+          ) : (
+            <div className="d-flex gap-5">
+              <Button
+                size="lg"
+                type="submit"
+                onClick={() => save(assignmentStatuses[1].status)}
+              >
+                Submit Assignment
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => (window.location.href = "/dashboard")}
+              >
+                Back
+              </Button>
+            </div>
+          )}
         </>
       ) : (
         <></>

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocalState } from "../util/useLocalStrorage";
 import { ajax } from "../Services/fetchService";
-import { Badge, Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
+import { StatusBadge } from "../StatusBadge";
 
 const Dashboard = () => {
+  //let navigate = useNavigate();
   const [jwt, setJwt] = useLocalState("", "jwt");
   const [assignments, setAssignments] = useState(null);
 
@@ -55,13 +57,7 @@ const Dashboard = () => {
                 {/* This div is required to keep the staus at the 
                 start only, not to expand to the full card width */}
                 <div className="d-flex align-items-start">
-                  <Badge
-                    pill
-                    bg="info"
-                    style={{ fontSize: "1em", justifyContent: "flex-start" }}
-                  >
-                    {assignment.status}
-                  </Badge>
+                  <StatusBadge text={assignment.status} />
                 </div>
                 <Card.Text style={{ marginTop: "1em" }}>
                   <p>
@@ -70,7 +66,7 @@ const Dashboard = () => {
                 </Card.Text>
                 <Card.Text>
                   <p>
-                    <b>GitHub Url:</b> {assignment.branch}
+                    <b>Branch:</b> {assignment.branch}
                   </p>
                 </Card.Text>
 

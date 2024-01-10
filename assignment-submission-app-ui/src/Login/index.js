@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useLocalState } from "../util/useLocalStrorage";
 //import { ajax } from "../Services/fetchService";
 import { Button, Col, Container, Row, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  //let navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [jwt, setJwt] = useLocalState("", "jwt");
@@ -31,7 +33,8 @@ const Login = () => {
         // It can be seen at the backend or Network->headers tab of the browser
         setJwt(headers.get("authorization"));
         //if logged successfully send to the dashboard page
-        window.location.href = "dashboard";
+        window.location.href = "/dashboard";
+        // navigate("/dashboard");
       })
       .catch((message) => {
         alert(message);
